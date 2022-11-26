@@ -18,7 +18,7 @@ var colors = [];
 var ground;
 var slingshotBird, slingshotConstraint;
 var angle=0;
-var angleSpeed=0.1;
+var angleSpeed=0;
 var canvas;
 ////////////////////////////////////////////////////////////
 function setup() {
@@ -57,9 +57,11 @@ function draw() {
 function keyPressed(){
   if (keyCode == LEFT_ARROW){
     //your code here
+      angleSpeed+=0.01;
   }
   else if (keyCode == RIGHT_ARROW){
     //your code here
+      angleSpeed-=0.01;
   }
 }
 ////////////////////////////////////////////////////////////
@@ -83,12 +85,12 @@ function keyTyped(){
 
 //if mouse is released destroy slingshot constraint so that
 //slingshot bird can fly off
-/*function mouseReleased(){
+function mouseReleased(){
   setTimeout(() => {
     slingshotConstraint.bodyB = null;
     slingshotConstraint.pointA = { x: 0, y: 0 };
   }, 100);
-}*/
+}
 ////////////////////////////////////////////////////////////
 //tells you if a body is off-screen
 function isOffScreen(body){
