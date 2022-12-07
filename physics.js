@@ -35,8 +35,13 @@ function drawPropeller(){
 }
 ////////////////////////////////////////////////////////////////
 function setupBird(){
-  var bird = Bodies.circle(mouseX, mouseY, 20, {friction: 0,
-      restitution: 0.95 });
+  var bird = Bodies.circle(mouseX, mouseY, 15, {friction: 0,
+      restitution: 0.95 ,
+      collisionFilter:{
+        category: defaultCategory,
+
+      }
+    });
   Matter.Body.setMass(bird, bird.mass*10);
   World.add(engine.world, [bird]);
   birds.push(bird);
@@ -70,7 +75,10 @@ function setupTower(){
     {
       //60 is ground.height/2 + box.height/2 (drawing from the center) mode(CENTER)
      var box=Bodies.rectangle(width*0.7+(j*80),height-(i*80)-60,80,80,
-      {restitution:0.7, isStatic:false });
+      {restitution:0.7, isStatic:false ,
+      collisionFilter:{  //so slingbird and tower only caninteract
+        category: defaultCategory}
+     });
      //(100*0.6+(j*80),400*0.8+(80*i),80,80,
      colors.push([random(100,250)]);
      World.add(engine.world, [box]);
@@ -96,11 +104,21 @@ function drawTower(){
   pop();
 }
 ////////////////////////////////////////////////////////////////
+//to create collision filters and masks that mouse has no effect on the tower 
+//guidance material https://www.temiz.dev/blog/matter-js-collisions-explained
+var defaultCategory = 0x0001; 
+var redCategory = 0x0002; 
+var yellowCategory = 0x0004 ;
 function setupSlingshot(){
 //your code here
 fill(255);
-slingshotBird=Bodies.circle(150, height/2, 30, {friction: 0,
-  restitution: 0.95 });
+slingshotBird=Bodies.circle(150, height/2, 15, {friction: 0,
+  restitution: 0.95 ,
+  
+  collisionFilter:{
+    category: redCategory, //interact with red and defaultCategory
+  }
+});
 Matter.Body.setMass(slingshotBird, slingshotBird.mass*10);
 
 
@@ -111,7 +129,10 @@ slingshotConstraint=Constraint.create({
   stiffness:0.01,
   damping :0.0001
 });
+//slingshotBird.setCollisionGroup(1);
+//slingshotBird.setCollidesWith(0);
 World.add(engine.world, [slingshotBird,slingshotConstraint]);
+
 
 }
 ////////////////////////////////////////////////////////////////
@@ -126,13 +147,21 @@ function drawSlingshot(){
 }
 /////////////////////////////////////////////////////////////////
 function setupMouseInteraction(){
+  // to avoid mouse interact with boxes
+ 
   var mouse = Mouse.create(canvas.elt);
   var mouseParams = {
     mouse: mouse,
-    constraint: { stiffness: 0.05 }
+    constraint: { stiffness: 0.05 },
+    collisionFilter:{
+      mask: redCategory, // affect only red category 
+    }
   }
   mouseConstraint = MouseConstraint.create(engine, mouseParams);
   mouseConstraint.mouse.pixelRatio = pixelDensity();
   World.add(engine.world, mouseConstraint);
+  //mouseConstraint.setCollisionGroup(1);
+  //mouseConstraint.setCollidesWith(0);
+
 }
 
