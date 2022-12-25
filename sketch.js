@@ -11,7 +11,8 @@ var Mouse = Matter.Mouse;
 var MouseConstraint = Matter.MouseConstraint;
 
 var engine;
-var propeller;
+var propeller1;
+var propeller2;
 var boxes = [];
 var birds = [];
 var colors = [];
@@ -20,6 +21,8 @@ var slingshotBird, slingshotConstraint;
 var angle=0;
 var angleSpeed=0;
 var canvas;
+var totalNUMBirds=20;
+var totalSlings=15;
 ////////////////////////////////////////////////////////////
 function setup() {
   canvas = createCanvas(1000, 600);
@@ -28,13 +31,15 @@ function setup() {
 
   setupGround();
 
-  setupPropeller();
+  setupPropeller(150, 480, 200, 15);
 
   setupTower();
 
   setupSlingshot();
 
   setupMouseInteraction();
+  counter();
+
 }
 ////////////////////////////////////////////////////////////
 function draw() {
@@ -51,8 +56,22 @@ function draw() {
   drawBirds();
 
   drawSlingshot();
+ 
+  towerEvac();
+  winner();
+  texts();
 }
 ////////////////////////////////////////////////////////////
+//texts written on the screen
+function texts()
+{
+  textSize(32);
+  text(totalTime/1000,width/2,30);
+  textSize(15);
+  text(`birds count ${totalNUMBirds}`,10,25);
+  text(`slingsshots count ${totalSlings}`,10,50);
+
+}
 //use arrow keys to control propeller
 function keyPressed(){
   if (keyCode == LEFT_ARROW){
@@ -65,17 +84,21 @@ function keyPressed(){
   }
 }
 ////////////////////////////////////////////////////////////
+
 function keyTyped(){
   //if 'b' create a new bird to use with propeller
-  if (key==='b'){
+  //control slingshot number
+  if (key==='b'&&totalSlings>0){
     setupBird();
+    totalSlings--;
   }
 
   //if 'r' reset the slingshot
-  if (key==='r'){
+  if (key==='r'&&totalNUMBirds>0){
     removeFromWorld(slingshotBird);
     removeFromWorld(slingshotConstraint);
     setupSlingshot();
+    totalNUMBirds--; //control total number of birds to make it more difficult
   }
 }
 
@@ -97,6 +120,30 @@ function isOffScreen(body){
   var pos = body.position;
   return (pos.y > height || pos.x<0 || pos.x>width);
 }
+//removing offscreen boxes for the array 
+function towerEvac()
+{
+  for (let i=0;i<boxes.length;i++)
+  {
+    if(isOffScreen(boxes[i]))
+    {
+      boxes.splice(i,1);
+      i--;
+    }
+  }
+}
+//check if tower is empty
+function winner()
+{
+  const resul=(boxes.length==0)? true : false; //ternary operator :-D 
+  if(resul)
+  {
+      textSize(42);
+      text("you win hero",width/2,height/2);
+      noLoop();
+  }
+  
+}
 ////////////////////////////////////////////////////////////
 //removes a body from the physics world
 function removeFromWorld(body) {
@@ -109,6 +156,28 @@ function drawVertices(vertices) {
     vertex(vertices[i].x, vertices[i].y);
   }
   endShape(CLOSE);
+}
+var totalTime=60000;
+var decreasing=1000;
+function counter()
+{
+    setInterval(displayTime,decreasing);
+    
+}
+function displayTime()
+{
+if(totalTime<=1)
+{
+ 
+  stroke(255,0,0);
+  strokeWeight(42);
+  text("you lost",width/2,height/2);
+  noStroke();
+  noLoop()
+}
+totalTime-=decreasing;
+//console.log(totalTime);
+
 }
 ////////////////////////////////////////////////////////////
 function drawConstraint(constraint) {

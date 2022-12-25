@@ -14,12 +14,15 @@ function drawGround(){
   pop();
 }
 ////////////////////////////////////////////////////////////////
-function setupPropeller(){
+//set up propeller
+function setupPropeller(x,y,w,h){
   // your code here
-  propeller = Bodies.rectangle(150, 480, 200, 15, {isStatic: true, angle: angle});
-   World.add(engine.world, [propeller]);
+  propeller1 = Bodies.rectangle(x, y, w, h, {isStatic: true, angle: angle});
+  propeller2=Bodies.rectangle(width/2,height-y, w, h, {isStatic: true, angle: -angle});
+  World.add(engine.world, [propeller1,propeller2]);
 
 }
+
 ////////////////////////////////////////////////////////////////
 //updates and draws the propeller
 function drawPropeller(){
@@ -27,22 +30,25 @@ function drawPropeller(){
   push();
   // your code here
   fill(255);
-  drawVertices(propeller.vertices);
-  Body.setAngle(propeller, angle);
-  Body.setAngularVelocity(propeller, angleSpeed);
+  drawVertices(propeller1.vertices);
+  drawVertices(propeller2.vertices);
+  Body.setAngle(propeller1, angle);
+  Body.setAngle(propeller2, -angle);
+  Body.setAngularVelocity(propeller1, angleSpeed);
+  Body.setAngularVelocity(propeller2, angleSpeed);
   angle += angleSpeed;
   pop();
 }
 ////////////////////////////////////////////////////////////////
 function setupBird(){
-  var bird = Bodies.circle(mouseX, mouseY, 15, {friction: 0,
+  var bird = Bodies.circle(mouseX, mouseY, random(15,25), {friction: 0,
       restitution: 0.95 ,
       collisionFilter:{
         category: defaultCategory,
 
       }
     });
-  Matter.Body.setMass(bird, bird.mass*10);
+  Matter.Body.setMass(bird, bird.mass*random(10,30));
   World.add(engine.world, [bird]);
   birds.push(bird);
 }
@@ -112,14 +118,14 @@ var yellowCategory = 0x0004 ;
 function setupSlingshot(){
 //your code here
 fill(255);
-slingshotBird=Bodies.circle(150, height/2, 15, {friction: 0,
+slingshotBird=Bodies.circle(150, height/2, random(15,40), {friction: 0,
   restitution: 0.95 ,
   
   collisionFilter:{
     category: redCategory, //interact with red and defaultCategory
   }
 });
-Matter.Body.setMass(slingshotBird, slingshotBird.mass*10);
+Matter.Body.setMass(slingshotBird, slingshotBird.mass*random(15,45));
 
 
 slingshotConstraint=Constraint.create({
@@ -131,6 +137,7 @@ slingshotConstraint=Constraint.create({
 });
 //slingshotBird.setCollisionGroup(1);
 //slingshotBird.setCollidesWith(0);
+//by this way mouse won`t affect boxes or cause them to fall 
 World.add(engine.world, [slingshotBird,slingshotConstraint]);
 
 
